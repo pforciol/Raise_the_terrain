@@ -11,10 +11,27 @@
 
 #define ZOOM 50
 
+/**
+ * struct SDL_Instance - the SDL2 instance structure
+ * 
+ * @window: the window pointer
+ * @renderer: the renderer pointer
+ */
+
 typedef struct SDL_Instance {
 	SDL_Window *window;
 	SDL_Renderer *renderer;
 } SDL_Instance;
+
+/**
+ * struct RTT_Point - the Point structure
+ * 
+ * @x: the x value of the point
+ * @y: the y value of the point
+ * @z: the z value of the point
+ * @m_x: the modified x value of the point
+ * @m_y: the modified y value of the point
+ */
 
 typedef struct RTT_Point {
 	int x;
@@ -24,6 +41,15 @@ typedef struct RTT_Point {
 	int m_y;
 } RTT_Point;
 
+/**
+ * struct RTT_Data - the Data structure
+ * 
+ * @instance: the SDL2 Instance
+ * @coord: the array of Points constituates the grid
+ * @width: the Width of the grid
+ * @height: the Height of the grid
+ */
+
 typedef struct RTT_Data {
 	SDL_Instance instance;
 	RTT_Point **coord;
@@ -31,9 +57,17 @@ typedef struct RTT_Data {
 	int height;
 } RTT_Data;
 
-int init_instance(SDL_Instance *);
+/* EVENTS */
+int poll_events(void);
+
+/* INIT */
+int init(RTT_Data *data, char *filename);
 int check_file(FILE *fp, char *filename);
+int init_instance(SDL_Instance *);
 int init_data(RTT_Data *data, FILE *fp);
 int init_file(RTT_Data *data, FILE *fp);
+
+/* UTILS */
+int count_rows(char *line);
 
 #endif
