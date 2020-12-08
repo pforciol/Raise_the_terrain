@@ -55,7 +55,13 @@ typedef struct RTT_Data {
 	RTT_Point **coord;
 	int width;
 	int height;
+	int w_width;
+	int w_height;
 } RTT_Data;
+
+/* DRAW */
+void draw_grid(SDL_Instance instance, RTT_Data data);
+void convert_iso(RTT_Data *data);
 
 /* EVENTS */
 int poll_events(void);

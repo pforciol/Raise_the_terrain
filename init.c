@@ -107,6 +107,7 @@ int init_data(RTT_Data *data, FILE *fp)
 	char *line = NULL;
 	int line_count = 0;
 	size_t len = 0, read;
+	int w, h;
 
 	if (init_instance(&data->instance) != 0)
 		return (1);
@@ -120,6 +121,10 @@ int init_data(RTT_Data *data, FILE *fp)
 
 	data->width = 0;
 	data->height = line_count;
+
+	SDL_GetWindowSize(data->instance.window, &w, &h);
+	data->w_width = w;
+	data->w_height = h;
 	return (0);
 }
 
@@ -136,7 +141,7 @@ int init_file(RTT_Data *data, FILE *fp)
 {
 	char *line = NULL, *tmp = NULL;
 	size_t len = 0, read;
-	int y = 0, x;	
+	int y = 0, x;
 
 	while (y < data->height)
 	{
