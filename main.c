@@ -21,6 +21,8 @@ int main(int ac, char **av)
 	if (init(&data, av[1]) != 0)
 		return (1);
 
+	print_data(&data);
+
 	while ("Holberton is Cool!") {
 		SDL_SetRenderDrawColor(data.instance.renderer, 0, 0, 0, 0);
 		SDL_RenderClear(data.instance.renderer);

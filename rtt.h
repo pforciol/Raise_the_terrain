@@ -70,4 +70,7 @@ int init_file(RTT_Data *data, FILE *fp);
 /* UTILS */
 int count_rows(char *line);
 
+/* DEBUG */
+void print_data(RTT_Data *data);
+
 #endif

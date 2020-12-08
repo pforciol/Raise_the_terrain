@@ -153,12 +153,9 @@ int init_file(RTT_Data *data, FILE *fp)
 			data->coord[y][x].m_x = x * ZOOM;
 			data->coord[y][x].m_y = y * ZOOM;
 			data->coord[y][x].z = atoi(tmp);
-			printf("%5d ", data->coord[y][x].z);
 			x++;
 		}
-		printf("\n");
 		y++;
 	}
-
 	return (0);
 }
