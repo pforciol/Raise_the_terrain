@@ -155,8 +155,8 @@ int init_file(RTT_Data *data, FILE *fp)
 		{
 			data->coord[y][x].x = x;
 			data->coord[y][x].y = y;
-			data->coord[y][x].m_x = x * ZOOM;
-			data->coord[y][x].m_y = y * ZOOM;
+			data->coord[y][x].m_x = 0;
+			data->coord[y][x].m_y = 0;
 			data->coord[y][x].z = atoi(tmp);
 			x++;
 		}
