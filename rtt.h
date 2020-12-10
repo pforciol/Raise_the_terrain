@@ -39,8 +39,8 @@ typedef struct RTT_Point {
 	int x;
 	int y;
 	int z;
-	int m_x;
-	int m_y;
+	double m_x;
+	double m_y;
 } RTT_Point;
 
 /**
@@ -64,6 +64,7 @@ typedef struct RTT_Data {
 	int zoom;
 	int t_padding;
 	int l_padding;
+	double z_mul;
 } RTT_Data;
 
 /* DRAW */

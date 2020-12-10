@@ -21,11 +21,10 @@ int main(int ac, char **av)
 	if (init(&data, av[1]) != 0)
 		return (1);
 
-	//stick_to_zero(&data);
 	get_zoom(&data);
 	stick_to_zero(&data);
-	print_data(&data);
 	pad_grid(&data);
+	print_data(&data);
 
 	while ("Holberton is Cool!")
 	{
@@ -33,6 +32,8 @@ int main(int ac, char **av)
 		SDL_RenderClear(data.instance.renderer);
 		draw_grid(data.instance, data);
 		SDL_RenderPresent(data.instance.renderer);
+		if (data.z_mul <= 0.02 * ZOOM * 1.2)
+			data.z_mul += (0.01 / 5);
 		if (poll_events() == 1)
 			break;
 		SDL_RenderPresent(data.instance.renderer);

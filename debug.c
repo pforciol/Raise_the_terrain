@@ -4,8 +4,6 @@ void print_data(RTT_Data *data)
 {
 	int y = 0, x;
 
-	printf("Zoom: %d\n", data->zoom);
-
 	printf("Instance window address: %p\n", (void *)data->instance.window);
 	printf("Instance renderer address: %p\n\n", (void *)data->instance.renderer);
 
@@ -38,4 +36,9 @@ void print_data(RTT_Data *data)
 		printf("-");
 	}
 	printf("-\n");
+
+	printf("\nData Informations:\n");
+	printf("\tZoom: %d px\n", data->zoom);
+	printf("\tTop Padding: %d px\n", data->t_padding);
+	printf("\tLeft Padding: %d px\n", data->l_padding);
 }

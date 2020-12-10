@@ -48,8 +48,7 @@ void get_zoom(RTT_Data *data)
 					- data->coord[y][x].y * data->zoom * INCL;
 				data->coord[y][x].m_y =
 					data->coord[y][x].x * data->zoom * (1 - INCL)
-					+ data->coord[y][x].y * data->zoom * (1 - INCL)
-					- data->coord[y][x].z / 2;
+					+ data->coord[y][x].y * data->zoom * (1 - INCL);
 				x++;
 			}
 			y++;
@@ -62,13 +61,16 @@ void pad_grid(RTT_Data *data)
 {
 	int x, y = 0;
 
+	data->l_padding = (data->w_width - data->px_width) / 2 + PAD / 2;
+	data->t_padding = (data->w_height - data->px_height) / 2 + PAD / 2 ;
+
 	while (y < data->height)
 	{
 		x = 0;
 		while (x < data->width)
 		{
-			data->coord[y][x].m_x += (data->w_width - data->px_width) / 2 + PAD / 2;
-			data->coord[y][x].m_y += (data->w_height - data->px_height) / 2 + PAD / 2 ;
+			data->coord[y][x].m_x += data->l_padding;
+			data->coord[y][x].m_y += data->t_padding;
 			x++;
 		}
 	y++;
@@ -88,20 +90,17 @@ void draw_grid(SDL_Instance instance, RTT_Data data)
 		while (x < data.width - 1)
 		{
 			
-			SDL_RenderDrawLine(instance.renderer, data.coord[y][x].m_x, data.coord[y][x].m_y, data.coord[y + 1][x].m_x, data.coord[y + 1][x].m_y);
-			SDL_RenderDrawLine(instance.renderer, data.coord[y][x].m_x, data.coord[y][x].m_y, data.coord[y][x + 1].m_x, data.coord[y][x + 1].m_y);
-			SDL_RenderDrawPoint(instance.renderer, data.coord[y][x].m_x, data.coord[y][x].m_y);
+			SDL_RenderDrawLine(instance.renderer, data.coord[y][x].m_x, data.coord[y][x].m_y - data.coord[y][x].z * data.z_mul, data.coord[y + 1][x].m_x, data.coord[y + 1][x].m_y - data.coord[y + 1][x].z * data.z_mul);
+			SDL_RenderDrawLine(instance.renderer, data.coord[y][x].m_x, data.coord[y][x].m_y - data.coord[y][x].z * data.z_mul, data.coord[y][x + 1].m_x, data.coord[y][x + 1].m_y - data.coord[y][x + 1].z * data.z_mul);
 			x++;
 		}
-		SDL_RenderDrawLine(instance.renderer, data.coord[y][x].m_x, data.coord[y][x].m_y, data.coord[y + 1][x].m_x, data.coord[y + 1][x].m_y);
-		SDL_RenderDrawPoint(instance.renderer, data.coord[y][x].m_x, data.coord[y][x].m_y);
+		SDL_RenderDrawLine(instance.renderer, data.coord[y][x].m_x, data.coord[y][x].m_y - data.coord[y][x].z * data.z_mul, data.coord[y + 1][x].m_x, data.coord[y + 1][x].m_y - data.coord[y + 1][x].z * data.z_mul);
 		y++;
 	}
 	x = 0;
 	while (x < data.width - 1)
 	{
-		SDL_RenderDrawLine(instance.renderer, data.coord[y][x].m_x, data.coord[y][x].m_y, data.coord[y][x + 1].m_x, data.coord[y][x + 1].m_y);
+			SDL_RenderDrawLine(instance.renderer, data.coord[y][x].m_x, data.coord[y][x].m_y - data.coord[y][x].z * data.z_mul, data.coord[y][x + 1].m_x, data.coord[y][x + 1].m_y - data.coord[y][x + 1].z * data.z_mul);
 		x++;
 	}
-	SDL_RenderDrawPoint(instance.renderer, data.coord[y][x].m_x, data.coord[y][x].m_y);
 }
