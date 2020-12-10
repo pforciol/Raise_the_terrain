@@ -125,6 +125,10 @@ int init_data(RTT_Data *data, FILE *fp)
 	SDL_GetWindowSize(data->instance.window, &w, &h);
 	data->w_width = w;
 	data->w_height = h;
+
+	data->zoom = 50;
+	data->t_padding = 0;
+	data->l_padding = 0;
 	return (0);
 }
 
@@ -155,9 +159,14 @@ int init_file(RTT_Data *data, FILE *fp)
 		{
 			data->coord[y][x].x = x;
 			data->coord[y][x].y = y;
-			data->coord[y][x].m_x = 0;
-			data->coord[y][x].m_y = 0;
 			data->coord[y][x].z = atoi(tmp);
+			data->coord[y][x].m_x =
+				data->coord[y][x].x * data->zoom * INCL
+				- data->coord[y][x].y * data->zoom * INCL;
+			data->coord[y][x].m_y =
+				data->coord[y][x].x * data->zoom * (1 - INCL)
+				+ data->coord[y][x].y * data->zoom * (1 - INCL)
+				- data->coord[y][x].z / 3;
 			x++;
 		}
 		y++;

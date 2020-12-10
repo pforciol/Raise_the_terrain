@@ -22,14 +22,15 @@ int main(int ac, char **av)
 		return (1);
 
 	print_data(&data);
-	convert_iso(&data);
 
-	while ("Holberton is Cool!") {
+	while ("Holberton is Cool!")
+	{
 		SDL_SetRenderDrawColor(data.instance.renderer, 0, 0, 0, 0);
 		SDL_RenderClear(data.instance.renderer);
+		draw_grid(data.instance, data);
+		SDL_RenderPresent(data.instance.renderer);
 		if (poll_events() == 1)
 			break;
-		draw_grid(data.instance, data);
 		SDL_RenderPresent(data.instance.renderer);
 	}
 	SDL_DestroyRenderer(data.instance.renderer);
