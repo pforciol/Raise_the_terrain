@@ -9,8 +9,9 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-#define ZOOM 50
+#define ZOOM 25
 #define INCL 0.7
+#define PAD 100
 
 /**
  * struct SDL_Instance - the SDL2 instance structure
@@ -56,6 +57,8 @@ typedef struct RTT_Data {
 	RTT_Point **coord;
 	int width;
 	int height;
+	int px_width;
+	int px_height;
 	int w_width;
 	int w_height;
 	int zoom;
@@ -65,9 +68,9 @@ typedef struct RTT_Data {
 
 /* DRAW */
 void draw_grid(SDL_Instance instance, RTT_Data data);
-void convert_iso(RTT_Data *data);
-void get_dimensions(RTT_Data *data);
 void stick_to_zero(RTT_Data *data);
+void get_zoom(RTT_Data *data);
+void pad_grid(RTT_Data *data);
 
 /* EVENTS */
 int poll_events(void);

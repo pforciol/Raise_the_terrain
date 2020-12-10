@@ -121,12 +121,14 @@ int init_data(RTT_Data *data, FILE *fp)
 
 	data->width = 0;
 	data->height = line_count;
+	data->px_width = 0;
+	data->px_height = 0;
 
 	SDL_GetWindowSize(data->instance.window, &w, &h);
-	data->w_width = w;
-	data->w_height = h;
+	data->w_width = w - PAD;
+	data->w_height = h - PAD;
 
-	data->zoom = 50;
+	data->zoom = 1;
 	data->t_padding = 0;
 	data->l_padding = 0;
 	return (0);
@@ -166,7 +168,7 @@ int init_file(RTT_Data *data, FILE *fp)
 			data->coord[y][x].m_y =
 				data->coord[y][x].x * data->zoom * (1 - INCL)
 				+ data->coord[y][x].y * data->zoom * (1 - INCL)
-				- data->coord[y][x].z / 3;
+				- data->coord[y][x].z / 2;
 			x++;
 		}
 		y++;
