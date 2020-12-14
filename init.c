@@ -2,10 +2,10 @@
 
 /**
  * init - dispatch the initiation process (data validation, parsing)
- * 
+ *
  * @data: the RTT_Data structure containing main data
  * @filename: the name of the given file to open fp later
- * 
+ *
  * Return: 0 if success, 1 on error
  */
 
@@ -25,15 +25,15 @@ int init(RTT_Data *data, char *filename)
 		return (1);
 	fclose(fp);
 
-	return (0);	
+	return (0);
 }
 
 /**
  * check_file - checks if the file exists and if it's a regular file
- * 
+ *
  * @fp: the file pointer associated to the file
  * @filename: the name of the given file
- * 
+ *
  * Return: 0 if success, 1 on error
  */
 
@@ -53,9 +53,9 @@ int check_file(FILE *fp, char *filename)
 
 /**
  * init_instance - initializes the SDL2 instance
- * 
+ *
  * @instance: the SDL2 instance to initialize
- * 
+ *
  * Return: 0 if success, 1 on error
  */
 
@@ -71,7 +71,7 @@ int init_instance(SDL_Instance *instance)
 	/* Create a new Window instance */
 	instance->window = SDL_CreateWindow(
 		"Raise the Terrain - Holberton School Project",
-		SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1260, 720, 0);
+		SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WIN_W, WIN_H, 0);
 	if (instance->window == NULL)
 	{
 		fprintf(stderr, "SDL_CreateWindow Error: %s\n", SDL_GetError());
@@ -95,10 +95,10 @@ int init_instance(SDL_Instance *instance)
 /**
  * init_data - fill up the data structure, waiting for points to
  * be filled later
- * 
+ *
  * @data: the RTT_Data structure
  * @fp: the file pointer associated to the file
- * 
+ *
  * Return: 0 if success, 1 on error
  */
 
@@ -107,7 +107,6 @@ int init_data(RTT_Data *data, FILE *fp)
 	char *line = NULL;
 	int line_count = 0;
 	size_t len = 0, read;
-	int w, h;
 
 	if (init_instance(&data->instance) != 0)
 		return (1);
@@ -121,27 +120,18 @@ int init_data(RTT_Data *data, FILE *fp)
 
 	data->width = 0;
 	data->height = line_count;
-	data->px_width = 0;
-	data->px_height = 0;
-
-	SDL_GetWindowSize(data->instance.window, &w, &h);
-	data->w_width = w - PAD;
-	data->w_height = h - PAD;
 
 	data->zoom = 1;
-	data->t_padding = 0;
-	data->l_padding = 0;
-
-	data->z_mul = 0;
+	data->z_mul = 100;
 	return (0);
 }
 
 /**
  * init_file - converts the input file into RTT_Point's arrays
- * 
+ *
  * @data: the RTT_Data structure
  * @fp: the file pointer associated to the file
- * 
+ *
  * Return: 0 if success, 1 on error
  */
 
@@ -161,9 +151,12 @@ int init_file(RTT_Data *data, FILE *fp)
 		x = 0;
 		while ((tmp = strtok(x == 0 ? line : NULL, " ")))
 		{
-			data->coord[y][x].x = x;
-			data->coord[y][x].y = y;
-			data->coord[y][x].z = atoi(tmp);
+			data->coord[y][x].xf = x * ESP - (data->width - 1) * (ESP / 2);
+			data->coord[y][x].yf = y * ESP - (data->height - 1) * (ESP / 2);
+			data->coord[y][x].zf = atoi(tmp);
+			data->coord[y][x].x = data->coord[y][x].xf;
+			data->coord[y][x].y = data->coord[y][x].yf;
+			data->coord[y][x].z = data->coord[y][x].zf;
 			data->coord[y][x].m_x = 0;
 			data->coord[y][x].m_y = 0;
 			x++;

@@ -1,5 +1,11 @@
 #include "rtt.h"
 
+/**
+ * print_data - a debug function printing grid and some other data in console
+ *
+ * @data: the data structure
+ */
+
 void print_data(RTT_Data *data)
 {
 	int y = 0, x;
@@ -7,10 +13,6 @@ void print_data(RTT_Data *data)
 	printf("Instance window address: %p\n", (void *)data->instance.window);
 	printf("Instance renderer address: %p\n\n", (void *)data->instance.renderer);
 
-	printf("Window Informations:\n\t- Width: %d\n\t- Height : %d\n\n", data->w_width, data->w_height);
-
-	printf("Grid Informations:\n\t- Width: %d points\n\t- Height : %d points\n", data->width, data->height);
-	printf("\t- Width: %d px\n\t- Height : %d px\n\n", data->px_width, data->px_height);
 	while (y < data->height)
 	{
 		x = 0;
@@ -36,9 +38,8 @@ void print_data(RTT_Data *data)
 		printf("-");
 	}
 	printf("-\n");
+	printf("(Grid: %d x %d)\n", data->width, data->height);
 
 	printf("\nData Informations:\n");
-	printf("\tZoom: %d px\n", data->zoom);
-	printf("\tTop Padding: %d px\n", data->t_padding);
-	printf("\tLeft Padding: %d px\n", data->l_padding);
+	printf("\tInitial Zoom: %d px\n", data->zoom);
 }

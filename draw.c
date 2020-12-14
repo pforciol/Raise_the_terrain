@@ -1,39 +1,45 @@
 #include "rtt.h"
 
-void stick_to_zero(RTT_Data *data)
+/**
+ * convert_iso - converts flat map into an isometric grid
+ *
+ * @data: the data structure
+ */
+
+void convert_iso(RTT_Data *data)
 {
 	int x, y = 0;
-	int add_top, add_left;
+	int dx, dy, dz;
 
-	add_top = data->coord[0][0].m_y < 0 ? -data->coord[0][0].m_y : 0;
-	add_left = data->coord[data->height - 1][0].m_x < 0
-		? -data->coord[data->height - 1][0].m_x : 0;
-
-	if (add_top != 0 || add_left != 0)
+	while (y < data->height)
 	{
-		while (y < data->height)
+		x = 0;
+		while (x < data->width)
 		{
-			x = 0;
-			while (x < data->width)
-			{
-				data->coord[y][x].m_x += add_left;
-				data->coord[y][x].m_y += add_top;
-				x++;
-			}
-			y++;
-		}
-	}
+			dx = data->coord[y][x].x;
+			dy = data->coord[y][x].y;
+			dz = data->coord[y][x].z;
 
-	data->px_width = data->coord[0][data->width - 1].m_x - data->coord[data->height - 1][0].m_x;
-	data->px_height = data->coord[data->height - 1][data->width - 1].m_y - data->coord[0][0].m_y;
+			data->coord[y][x].m_x = INCL * (dx - dy) + WIN_W / 2;
+			data->coord[y][x].m_y = (1 - INCL) * (dx + dy) - dz + WIN_H / 2;
+			x++;
+		}
+		y++;
+	}
 }
 
-void get_zoom(RTT_Data *data)
+/**
+ * init_zoom - gets the default zoom for the grid to be fit inside the window
+ *
+ * @data: the data structure
+ */
+
+void init_zoom(RTT_Data *data)
 {
 	int x, y;
-	
-	while (data->coord[0][data->width - 1].m_x + (data->zoom + data->width + PAD) < data->w_width
-		&& data->coord[data->height - 1][data->width - 1].m_y + (data->zoom + data->height + PAD) < data->w_height)
+	int zx, zy;
+
+	while (1)
 	{
 		y = 0;
 		while (y < data->height)
@@ -41,66 +47,116 @@ void get_zoom(RTT_Data *data)
 			x = 0;
 			while (x < data->width)
 			{
-						
-
-				data->coord[y][x].m_x =
-					data->coord[y][x].x * data->zoom * INCL
-					- data->coord[y][x].y * data->zoom * INCL;
-				data->coord[y][x].m_y =
-					data->coord[y][x].x * data->zoom * (1 - INCL)
-					+ data->coord[y][x].y * data->zoom * (1 - INCL);
+				zx = WIN_W / 2 + ((data->coord[y][x].m_x - WIN_W / 2)
+					* (data->zoom + 1)) / 100;
+				zy = WIN_H / 2 + ((data->coord[y][x].m_y - WIN_H / 2)
+					* (data->zoom + 1)) / 100;
+				if (zx < PAD || zy < PAD)
+					return;
 				x++;
 			}
 			y++;
 		}
-		data->zoom++;
+		if (zx < WIN_W - PAD && zy < WIN_H - PAD)
+			data->zoom++;
+		else
+			return;
 	}
+
 }
 
-void pad_grid(RTT_Data *data)
+/**
+ * update_grid - update the modifiable values of the grid
+ *
+ * @data: the data structure
+ */
+
+void update_grid(RTT_Data *data)
 {
 	int x, y = 0;
-
-	data->l_padding = (data->w_width - data->px_width) / 2 + PAD / 2;
-	data->t_padding = (data->w_height - data->px_height) / 2 + PAD / 2 ;
+	int tx, ty, tz;
+	float a = data->rot * M_PI / 180;
 
 	while (y < data->height)
 	{
 		x = 0;
 		while (x < data->width)
 		{
-			data->coord[y][x].m_x += data->l_padding;
-			data->coord[y][x].m_y += data->t_padding;
+			tx = data->coord[y][x].xf;
+			ty = data->coord[y][x].yf;
+			tz = data->coord[y][x].zf;
+			data->coord[y][x].x = tx * cos(a) - ty * sin(a);
+			data->coord[y][x].y = tx * sin(a) + ty * cos(a);
+			data->coord[y][x].z = (tz * data->z_mul) / 100;
 			x++;
 		}
-	y++;
+		y++;
 	}
+	convert_iso(data);
 }
 
+/**
+ * draw_grid - draws the grid in the window in isometric view
+ *
+ * @instance: the SDL2 instance
+ * @data: the data structure
+ */
 
 void draw_grid(SDL_Instance instance, RTT_Data data)
 {
 	int x, y = 0;
-	
+	int fx, fy, tx1, ty1, tx2, ty2;
+
 	SDL_SetRenderDrawColor(instance.renderer, 255, 255, 255, 255);
 
-	while (y < data.height - 1)
+	while (y + 1 < data.height)
 	{
 		x = 0;
-		while (x < data.width - 1)
+		while (x + 1 < data.width)
 		{
-			
-			SDL_RenderDrawLine(instance.renderer, data.coord[y][x].m_x, data.coord[y][x].m_y - data.coord[y][x].z * data.z_mul, data.coord[y + 1][x].m_x, data.coord[y + 1][x].m_y - data.coord[y + 1][x].z * data.z_mul);
-			SDL_RenderDrawLine(instance.renderer, data.coord[y][x].m_x, data.coord[y][x].m_y - data.coord[y][x].z * data.z_mul, data.coord[y][x + 1].m_x, data.coord[y][x + 1].m_y - data.coord[y][x + 1].z * data.z_mul);
+			fx = WIN_W / 2 + ((data.coord[y][x].m_x - WIN_W / 2)
+				* data.zoom) / 100;
+			fy = WIN_H / 2 + ((data.coord[y][x].m_y - WIN_H / 2)
+				* data.zoom) / 100;
+
+			tx1 = WIN_W / 2 + ((data.coord[y + 1][x].m_x - WIN_W / 2)
+				* data.zoom) / 100;
+			ty1 = WIN_H / 2 + ((data.coord[y + 1][x].m_y - WIN_H / 2)
+				* data.zoom) / 100;
+			SDL_RenderDrawLine(instance.renderer, fx, fy, tx1, ty1);
+
+			tx2 = WIN_W / 2 + ((data.coord[y][x + 1].m_x - WIN_W / 2)
+				* data.zoom) / 100;
+			ty2 = WIN_H / 2 + ((data.coord[y][x + 1].m_y - WIN_H / 2)
+				* data.zoom) / 100;
+			SDL_RenderDrawLine(instance.renderer, fx, fy, tx2, ty2);
 			x++;
 		}
-		SDL_RenderDrawLine(instance.renderer, data.coord[y][x].m_x, data.coord[y][x].m_y - data.coord[y][x].z * data.z_mul, data.coord[y + 1][x].m_x, data.coord[y + 1][x].m_y - data.coord[y + 1][x].z * data.z_mul);
+		fx = WIN_W / 2 + ((data.coord[y][x].m_x - WIN_W / 2)
+			* data.zoom) / 100;
+		fy = WIN_H / 2 + ((data.coord[y][x].m_y - WIN_H / 2)
+			* data.zoom) / 100;
+
+		tx1 = WIN_W / 2 + ((data.coord[y + 1][x].m_x - WIN_W / 2)
+			* data.zoom) / 100;
+		ty1 = WIN_H / 2 + ((data.coord[y + 1][x].m_y - WIN_H / 2)
+			* data.zoom) / 100;
+		SDL_RenderDrawLine(instance.renderer, fx, fy, tx1, ty1);
 		y++;
 	}
 	x = 0;
-	while (x < data.width - 1)
+	while (x + 1 < data.width)
 	{
-			SDL_RenderDrawLine(instance.renderer, data.coord[y][x].m_x, data.coord[y][x].m_y - data.coord[y][x].z * data.z_mul, data.coord[y][x + 1].m_x, data.coord[y][x + 1].m_y - data.coord[y][x + 1].z * data.z_mul);
+		fx = WIN_W / 2 + ((data.coord[y][x].m_x - WIN_W / 2)
+			* data.zoom) / 100;
+		fy = WIN_H / 2 + ((data.coord[y][x].m_y - WIN_H / 2)
+			* data.zoom) / 100;
+
+		tx2 = WIN_W / 2 + ((data.coord[y][x + 1].m_x - WIN_W / 2)
+			* data.zoom) / 100;
+		ty2 = WIN_H / 2 + ((data.coord[y][x + 1].m_y - WIN_H / 2)
+			* data.zoom) / 100;
+		SDL_RenderDrawLine(instance.renderer, fx, fy, tx2, ty2);
 		x++;
 	}
 }
